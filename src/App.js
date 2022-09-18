@@ -1,6 +1,7 @@
-import { Canvas } from '@react-three/fiber'
-import { useRef, useState} from 'react'
-import { useFrame } from '@react-three/fiber'
+import { Canvas, useLoader, useFrame } from '@react-three/fiber'
+import { useRef, useState, Suspense, useMemo } from 'react'
+import { TextureLoader } from 'three/src/loaders/TextureLoader'
+import starPng from './assets/star.png'
 
 function Box(props) {
     // This reference will give us direct access to the mesh
@@ -25,18 +26,63 @@ function Box(props) {
     )
 }
 
+const Stars = () => {
+    const starSprite = useLoader(TextureLoader, starPng)
+    const vertice = () => Math.random() * 600 - 300
+    // const mesh = useRef()
+
+    const count = 6000
+
+    const positions = useMemo(() => {
+        const positions = []
+
+        for (let xi = 0; xi < count; xi++) {
+            positions.push(vertice(), vertice(), vertice())
+            // for(let zi = 0; zi < count; zi++) {
+            //     const x = sep * (xi - count / 2)
+            //     const z = sep * (zi - count / 2)
+            //     const y = 0
+            //     positions.push(x,y,z)
+            // }
+        }
+
+        console.log(positions)
+        return new Float32Array(positions)
+    }, [count])
+
+    return (
+        <points>
+            <bufferGeometry attach="geometry" >
+                <bufferAttribute
+                    attach={'attributes-position'}
+                    array={positions}
+                    count={positions.length / 3}
+                    itemSize={3}
+                />
+            </bufferGeometry>
+            <pointsMaterial attach="material" map={starSprite} color={0xaaaaaa} size={0.8} transparent={false}
+                alphaTest={0.5} opacity={1.0} />
+        </points>
+    )
+}
+
 
 const App = () => {
-  return (
-      <div id="canvas-container">
-          <Canvas>
-              <ambientLight />
-              <pointLight position={[10, 10, 10]} />
-              <Box position={[-1.2, 0, 0]} />
-              <Box position={[1.2, 0, 0]} />
-          </Canvas>
-      </div>
-  )
+
+    const camera = { fov: 60, aspect: window.innerWidth / window.innerHeight, position: [100, 10, 0] }
+
+
+    return (
+              <Suspense fallback={null}>
+                <Canvas camera={camera}>
+                  <Stars />
+                  <ambientLight />
+                  <pointLight position={[10, 10, 10]} />
+                  {/*<Box position={[-1.2, 0, 0]} />*/}
+                  <Box position={[1.2, 0, 0]} />
+                </Canvas>
+              </Suspense>
+    )
 }
 
 export default App
