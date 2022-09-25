@@ -1,26 +1,104 @@
-import { Canvas, useLoader, useFrame } from '@react-three/fiber'
-import { useRef, useState, Suspense, useMemo } from 'react'
+import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber'
+import { useRef, useState, Suspense, useMemo, useEffect } from 'react'
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
+import { FlyControls } from '@react-three/drei'
 import starPng from './assets/star.png'
 
+// function Controls() {
+//     const { camera, gl: { domElement } } = useThree()
+//     return <orbitControls args={[camera, domElement]} />
+// }
+
+function Controls() {
+        const { camera, gl: { domElement } } = useThree()
+    return <firstPersonControls args={[camera, domElement]} />
+}
+
 function Box(props) {
-    // This reference will give us direct access to the mesh
-    const mesh = useRef()
-    // Set up state for the hovered and active state
     const [hovered, setHover] = useState(false)
     const [active, setActive] = useState(false)
-    // Subscribe this component to the render-loop, rotate the mesh every frame
-    useFrame((state, delta) => (mesh.current.rotation.x += 0.01))
-    // Return view, these are regular three.js elements expressed in JSX
+    const [movingForward, setMovingForward] = useState(false)
+    const [turningUp, setTurningUp] = useState(false)
+    const [turningDown, setTurningDown] = useState(false)
+    const [turningLeft, setTurningLeft] = useState(false)
+    const [turningRight, setTurningRight] = useState(false)
+    const mesh = useRef()
+    const { camera } = useThree()
+
+    useEffect(() => {
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                // case 'w':
+                // case 'arrowUp':
+                //     setTurningDown(true)
+                //     break
+                // case 's': case 'arrowDown':
+                //     setTurningUp(true)
+                // case 'a': case 'arrowLeft':
+                //     setTurningLeft(true)
+                //     break
+                // case 'd': case 'arrowRight':
+                //     setTurningRight(true)
+                //     break
+                case 'Shift': case 'm':
+                    setMovingForward(true)
+            }
+        })
+        document.addEventListener('keyup', (e) => {
+            switch (e.key) {
+                // case 'w':
+                // case 'arrowUp':
+                //     setTurningDown(false)
+                //     break
+                // case 's': case 'arrowDown':
+                //     setTurningUp(false)
+                // case 'a': case 'arrowLeft':
+                //     setTurningLeft(false)
+                //     break
+                // case 'd': case 'arrowRight':
+                //     setTurningRight(false)
+                //     break
+                case 'Shift': case 'm':
+                    setMovingForward(false)
+            }
+        })
+        mesh.current.rotation.x = Math.PI / 2;
+        // return () => {
+        //     document.removeEventListener('keypress')
+        // }
+    },[])
+
+    useFrame(({ camera }) => {
+        // Move mesh to be flush with camera
+        mesh.current.position.copy(camera.position)
+        mesh.current.quaternion.copy(camera.quaternion)
+
+        if (movingForward) camera.translateZ(-0.5)
+        // if (turningUp) camera.rotation.y += 0.005
+        // if (turningDown) camera.rotation.y -= 0.005
+        // if (turningLeft) camera.rotation.x += 0.005
+        // if (turningRight) camera.rotation.x -= 0.005
+
+
+
+        // Apply offset
+        // camera.rotation.x = 5
+        // camera.rotation.y += Math.PI * 0.00025
+        mesh.current.translateZ(-5)
+        camera.rotation.x += 0.0002
+        // mesh.current.rotation.x += 0.001
+    })
+
     return (
         <mesh
             {...props}
             ref={mesh}
-            scale={active ? 2.5 : 2}
+            scale={active ? 1.5 : 1}
             onClick={(event) => setActive(!active)}
             onPointerOver={(event) => setHover(true)}
             onPointerOut={(event) => setHover(false)}>
             <boxGeometry args={[1, 1, 1]} />
+            <axesHelper args={[10]} />
             <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
         </mesh>
     )
@@ -29,9 +107,13 @@ function Box(props) {
 const Stars = () => {
     const starSprite = useLoader(TextureLoader, starPng)
     const vertice = () => Math.random() * 600 - 300
-    // const mesh = useRef()
-
+    const starsRef = useRef()
     const count = 6000
+
+    useFrame(() => {
+        // starsRef.current.rotation.x += 0.0002
+        // starsRef.current.position.x += 0.01
+    })
 
     const positions = useMemo(() => {
         const positions = []
@@ -51,7 +133,7 @@ const Stars = () => {
     }, [count])
 
     return (
-        <points>
+        <points ref={starsRef}>
             <bufferGeometry attach="geometry" >
                 <bufferAttribute
                     attach={'attributes-position'}
@@ -75,11 +157,12 @@ const App = () => {
     return (
               <Suspense fallback={null}>
                 <Canvas camera={camera}>
+                    <FlyControls movementSpeed={5} rollSpeed={0.1} />
                   <Stars />
                   <ambientLight />
                   <pointLight position={[10, 10, 10]} />
                   {/*<Box position={[-1.2, 0, 0]} />*/}
-                  <Box position={[1.2, 0, 0]} />
+                  <Box position={[90, 10, 0]} />
                 </Canvas>
               </Suspense>
     )
