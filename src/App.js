@@ -1,18 +1,53 @@
-import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useLoader, useFrame } from '@react-three/fiber'
 import { useRef, useState, Suspense, useMemo, useEffect } from 'react'
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
-import { FlyControls } from '@react-three/drei'
+import { FlyControls, useGLTF, useAnimations } from '@react-three/drei'
 import starPng from './assets/star.png'
 
-// function Controls() {
-//     const { camera, gl: { domElement } } = useThree()
-//     return <orbitControls args={[camera, domElement]} />
-// }
 
-function Controls() {
-        const { camera, gl: { domElement } } = useThree()
-    return <firstPersonControls args={[camera, domElement]} />
+const SpaceShip = (props) => {
+    const [movingForward, setMovingForward] = useState(false)
+    const group = useRef()
+    const gltf = useGLTF( '/models/starship/scene.gltf')
+    const { actions, mixer } = useAnimations(gltf.animations, group)
+
+    useEffect(() => {
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'Shift': case 'm':
+                    setMovingForward(true)
+            }
+        })
+        document.addEventListener('keyup', (e) => {
+            switch (e.key) {
+                case 'Shift': case 'm':
+                    setMovingForward(false)
+            }
+        })
+    },[])
+
+    useEffect(() => {
+        const animation = actions['Take 001']
+        animation.timeScale = 0.2
+        animation.play()
+        console.log(group.current)
+    }, [mixer])
+
+    useFrame(({ camera }) => {
+        // Move mesh to be flush with camera
+        group.current.position.copy(camera.position)
+        group.current.translateY(-3)
+        group.current.quaternion.copy(camera.quaternion)
+        group.current.rotation.y -= 0.09
+        if (movingForward) camera.translateZ(-0.5)
+
+        group.current.translateZ(-25)
+    })
+
+    return <primitive {...props} scale={0.3} ref={group} object={gltf.scene} />
 }
+
+useGLTF.preload("/models/starship/scene.gltf")
 
 function Box(props) {
     const [hovered, setHover] = useState(false)
@@ -23,41 +58,16 @@ function Box(props) {
     const [turningLeft, setTurningLeft] = useState(false)
     const [turningRight, setTurningRight] = useState(false)
     const mesh = useRef()
-    const { camera } = useThree()
 
     useEffect(() => {
         document.addEventListener('keydown', (e) => {
             switch (e.key) {
-                // case 'w':
-                // case 'arrowUp':
-                //     setTurningDown(true)
-                //     break
-                // case 's': case 'arrowDown':
-                //     setTurningUp(true)
-                // case 'a': case 'arrowLeft':
-                //     setTurningLeft(true)
-                //     break
-                // case 'd': case 'arrowRight':
-                //     setTurningRight(true)
-                //     break
                 case 'Shift': case 'm':
                     setMovingForward(true)
             }
         })
         document.addEventListener('keyup', (e) => {
             switch (e.key) {
-                // case 'w':
-                // case 'arrowUp':
-                //     setTurningDown(false)
-                //     break
-                // case 's': case 'arrowDown':
-                //     setTurningUp(false)
-                // case 'a': case 'arrowLeft':
-                //     setTurningLeft(false)
-                //     break
-                // case 'd': case 'arrowRight':
-                //     setTurningRight(false)
-                //     break
                 case 'Shift': case 'm':
                     setMovingForward(false)
             }
@@ -74,6 +84,7 @@ function Box(props) {
         mesh.current.quaternion.copy(camera.quaternion)
 
         if (movingForward) camera.translateZ(-0.5)
+        mesh.current.translateZ(-5)
         // if (turningUp) camera.rotation.y += 0.005
         // if (turningDown) camera.rotation.y -= 0.005
         // if (turningLeft) camera.rotation.x += 0.005
@@ -84,7 +95,6 @@ function Box(props) {
         // Apply offset
         // camera.rotation.x = 5
         // camera.rotation.y += Math.PI * 0.00025
-        mesh.current.translateZ(-5)
         camera.rotation.x += 0.0002
         // mesh.current.rotation.x += 0.001
     })
@@ -128,7 +138,6 @@ const Stars = () => {
             // }
         }
 
-        console.log(positions)
         return new Float32Array(positions)
     }, [count])
 
@@ -158,11 +167,12 @@ const App = () => {
               <Suspense fallback={null}>
                 <Canvas camera={camera}>
                     <FlyControls movementSpeed={5} rollSpeed={0.1} />
-                  <Stars />
+                    <Stars />
+                    <SpaceShip position={[90, 10, 0]} />
                   <ambientLight />
                   <pointLight position={[10, 10, 10]} />
                   {/*<Box position={[-1.2, 0, 0]} />*/}
-                  <Box position={[90, 10, 0]} />
+                  {/*<Box position={[90, 10, 0]} />*/}
                 </Canvas>
               </Suspense>
     )

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Luminaris Starship - Night view
+* source:	https://sketchfab.com/3d-models/luminaris-starship-night-view-85c07f1546ec4574b5183597f35b2a88
+* author:	iggy-design (https://sketchfab.com/iggy-design)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Luminaris Starship - Night view" (https://sketchfab.com/3d-models/luminaris-starship-night-view-85c07f1546ec4574b5183597f35b2a88) by iggy-design (https://sketchfab.com/iggy-design) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,0 +1,11 @@
+Model Information:
+* title:	NX12 MR-F "Scythe" Starfighter
+* source:	https://sketchfab.com/3d-models/nx12-mr-f-scythe-starfighter-1c51b29f772b49fb9a23f61a25bbe8c6
+* author:	Aryx3D (https://sketchfab.com/Aryx3D)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "NX12 MR-F "Scythe" Starfighter" (https://sketchfab.com/3d-models/nx12-mr-f-scythe-starfighter-1c51b29f772b49fb9a23f61a25bbe8c6) by Aryx3D (https://sketchfab.com/Aryx3D) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
